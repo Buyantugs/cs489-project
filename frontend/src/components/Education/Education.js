@@ -30,14 +30,14 @@ const Education = () => {
     <div className="education">
       <h3><strong>Education</strong></h3>
       {educationData.map((edu) => (
-        <div key={edu.eduId} className="education-item">
+        <div key={edu.eduId} className="education-item" style={{ fontStyle: 'italic', fontSize:"small" }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight:"bolder" }}>
                                             <div>{edu.degree}</div>
                                             <div>{edu.institution_name}</div>
                                             <div>{edu.address}</div>
                                         </div>
           
-          <p>
+          <p style={{ fontStyle: 'italic', fontSize:"small" }}>
             {new Date(edu.startDate).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
@@ -50,7 +50,7 @@ const Education = () => {
                 })
               : 'Present'}
           </p>
-          <p className="courses">Courses: {edu.courses}</p>
+          <p className="courses" style={{ fontStyle: 'italic', fontSize:"small" }}>Courses: {edu.courses}</p>
           <br></br>
         </div>
       ))}
