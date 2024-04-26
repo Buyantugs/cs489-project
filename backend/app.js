@@ -45,7 +45,6 @@ const connection = mysql.createConnection({
 });
 
 
-
 // Connect to the database
 connection.connect((err) => {
   if (err) {
@@ -54,7 +53,6 @@ connection.connect((err) => {
   }
   console.log('Connected to MySQL database');
 });
-
 
 
 // Endpoint to get profile from the database
@@ -70,7 +68,7 @@ app.get('/profile/:profileId', async (req, res) => {
 });
 
 // // Endpoint to update profile data
-app.post('/profile/:profileId', async (req, res) => {
+app.put('/profile/:profileId', async (req, res) => {
   const profileId = req.params.profileId;
   const newData = req.body;
   try {
@@ -84,13 +82,13 @@ app.post('/profile/:profileId', async (req, res) => {
 
 
 // Endpoint to retrieve experience data
-app.get('/experience/:profileId', async (req, res) => {
+app.get('/profile/:profileId/experience', async (req, res) => {
   const profileId = req.params.profileId;
   try {
     const [experienceRows] = await connection.promise().query('SELECT * FROM Experience WHERE Profile_profileId=?',[profileId]);
     const experience = await Promise.all(experienceRows.map(async (experienceRow) => {
       const [positionRows] = await connection.promise().query('SELECT * FROM Position WHERE position_id = ?', [experienceRow.Position_position_id]);
-      const [achievementRows] = await connection.promise().query('SELECT * FROM Achievement WHERE Experience_experience_id = ?', [experienceRow.experience_id]);
+      const [achievementRows] = await connection.promise().query('SELECT * FROM Achievement WHERE Experience_experience_id = ? order by order_seq', [experienceRow.experience_id]);
       return {
         experience: experienceRow,
         position: positionRows[0], // Assuming there's only one position per experience
@@ -130,7 +128,7 @@ app.get('/profile/:profileId/education', async (req, res) => {
 
 
 // // Endpoint to update education data
-app.post('/profile/:profileId/education/:eduId', async (req, res) => {
+app.put('/profile/:profileId/education/:eduId', async (req, res) => {
   const profileId = req.params.profileId;
   const eduId = req.params.eduId;
   const newData = req.body;
@@ -142,6 +140,54 @@ app.post('/profile/:profileId/education/:eduId', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+// Endpoint to get achivement for an ex from the database
+app.get('/achievement/:expId', async (req, res) => {
+  
+  const expId = req.params.expId;
+  try {
+    const [rows, fields] = await connection.promise().query('SELECT * FROM achievement where Experience_experience_id=?',[expId]); 
+    res.json(rows);
+  } catch (error) {
+    console.error('Error retrieving data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Endpoint to delete an achivement by ID from the database
+app.delete('/achievement/:achId', async (req, res) => {  
+  const achId = req.params.achId;
+  try {
+    const [result] = await connection.promise().query('DELETE FROM achievement WHERE achievment_id = ?', [achId]); 
+    if (result.affectedRows === 1) {      
+      res.status(200).json({ message: 'Achievement deleted successfully.' });
+    } else {      
+      res.status(404).json({ message: 'Achievement not found.' });
+    }
+  } catch (error) {
+    console.error('Error deleting achievement:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+
+// Endpoint to add an achivement to the database
+
+app.post('/achievement', async (req, res) => {
+  const { achievment_description, Experience_experience_id, order_seq } = req.body;
+
+  try {
+    const [result] = await connection.promise().query('INSERT INTO achievement (achievment_description, Experience_experience_id, order_seq) VALUES (?, ?, ?)', [achievment_description, Experience_experience_id, order_seq]);
+    const insertedId = result.insertId;
+    res.json({ id: insertedId, message: 'Achievement added successfully' });
+  } catch (error) {
+    console.error('Error adding achievement:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 app.use((req, res, next) => {
   res.send("API is not supported");

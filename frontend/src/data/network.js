@@ -15,7 +15,7 @@ export async function getProfile(profileId, token) {
 }
 
 export async function getResumeExperience(profileId,token) {
-    const url = `/experience/${profileId}`;
+    const url = `/profile/${profileId}/experience`;
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   
     try {
