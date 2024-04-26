@@ -25,7 +25,7 @@ function ProjectCard() {
       }
     }
     getData();
-  }, []); 
+  }, [state.token]); 
 
   return (
     <>

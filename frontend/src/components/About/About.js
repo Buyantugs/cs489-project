@@ -8,7 +8,8 @@ import {
   TechName,
   ContactWrapper,
 } from "./AboutElements";
-import SkillBars from "./SkillBar";
+
+import Education from "../Education/Education";
 
 export default function About({data}) {
 
@@ -40,7 +41,7 @@ export default function About({data}) {
             ))}
           </Technologies>         
    
-            {/* <SkillBars/> */}
+            {<Education/>}
 		      
         </div>        
       </div>

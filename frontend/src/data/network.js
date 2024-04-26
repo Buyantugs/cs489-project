@@ -39,3 +39,16 @@ export async function getProjects(profileId, token) {
       return null;
   }
 }
+
+export async function getEducation(profileId, token) {
+  const url = `/profile/${profileId}/education`;
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+  try {
+      const res = await axios.get(url);
+      //console.log(res.data);
+      return res.data;
+  } catch (error) {
+      return null;
+  }
+}

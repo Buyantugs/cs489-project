@@ -24,7 +24,7 @@ function Home() {
       }
     }
     getData();
-  }, []); 
+  }, [state.token]); 
 
   return (
     <>
