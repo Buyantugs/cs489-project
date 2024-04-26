@@ -83,7 +83,7 @@ app.post('/profile/:profileId', async (req, res) => {
 });
 
 
-// Endpoint to retrieve resume experience data
+// Endpoint to retrieve experience data
 app.get('/experience/:profileId', async (req, res) => {
   const profileId = req.params.profileId;
   try {
@@ -112,6 +112,33 @@ app.get('/profile/:profileId/projects', async (req, res) => {
     res.json(rows);
   } catch (error) {
     console.error('Error retrieving data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Endpoint to get education from the database
+app.get('/profile/:profileId/education', async (req, res) => {
+  const profileId = req.params.profileId;
+  try {
+    const [rows, fields] = await connection.promise().query('SELECT * FROM portfolio.education where profile_profileid=?',[profileId]); // Changed table name to 'profile'
+    res.json(rows);
+  } catch (error) {
+    console.error('Error retrieving data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+// // Endpoint to update education data
+app.post('/profile/:profileId/education/:eduId', async (req, res) => {
+  const profileId = req.params.profileId;
+  const eduId = req.params.eduId;
+  const newData = req.body;
+  try {
+    await connection.promise().query('UPDATE education SET ? WHERE profile_profileid = ? and eduId=?', [newData, profileId,eduId]);
+    res.send('Education updated successfully');
+  } catch (error) {
+    console.error('Error updating profile data:', error);
     res.status(500).send('Internal Server Error');
   }
 });
